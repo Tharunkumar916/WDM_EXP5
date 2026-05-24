@@ -1,5 +1,5 @@
 ### EX5 Information Retrieval Using Boolean Model in Python
-### DATE: 
+### DATE: 24.05.2026
 ### AIM: To implement Information Retrieval Using Boolean Model in Python.
 ### Description:
 <div align = "justify">
@@ -23,14 +23,18 @@ The Boolean model in Information Retrieval (IR) is a fundamental model used for 
 
 ### Program:
 
+   ```
     import numpy as np
-    import pandas as pd
-    class BooleanRetrieval:
-        def __init__(self):
-            self.index = {}
-            self.documents_matrix = None
+import pandas as pd
+
+class BooleanRetrieval:
+    def __init__(self):
+        self.index = {}
+        self.documents_matrix = None
+        self.documents = {}
 
     def index_document(self, doc_id, text):
+        self.documents[doc_id] = text
         terms = text.lower().split()
         print("Document -", doc_id, terms)
 
@@ -39,14 +43,14 @@ The Boolean model in Information Retrieval (IR) is a fundamental model used for 
                 self.index[term] = set()
             self.index[term].add(doc_id)
 
-    def create_documents_matrix(self, documents):
+    def create_documents_matrix(self):
         terms = list(self.index.keys())
-        num_docs = len(documents)
+        num_docs = len(self.documents)
         num_terms = len(terms)
 
         self.documents_matrix = np.zeros((num_docs, num_terms), dtype=int)
 
-        for i, (doc_id, text) in enumerate(documents.items()):
+        for i, (doc_id, text) in enumerate(self.documents.items()):
             doc_terms = text.lower().split()
             for term in doc_terms:
                 if term in self.index:
@@ -55,16 +59,43 @@ The Boolean model in Information Retrieval (IR) is a fundamental model used for 
 
     def print_documents_matrix_table(self):
         df = pd.DataFrame(self.documents_matrix, columns=self.index.keys())
+        print("\nDocument-Term Matrix:\n")
         print(df)
 
     def print_all_terms(self):
-        print("All terms in the documents:")
+        print("\nAll terms in the documents:")
         print(list(self.index.keys()))
 
     def boolean_search(self, query):
-        # TYPE YOUR CODE HERE
+        query = query.lower().split()
+        result = set(self.documents.keys())
 
+        i = 0
+        while i < len(query):
+            term = query[i]
+
+            if term == "and":
+                i += 1
+                next_term = query[i]
+                result = result.intersection(self.index.get(next_term, set()))
+
+            elif term == "or":
+                i += 1
+                next_term = query[i]
+                result = result.union(self.index.get(next_term, set()))
+            elif term == "not":
+                i += 1
+                next_term = query[i]
+                result = result.difference(self.index.get(next_term, set()))
+            else:
+                result = self.index.get(term, set())
+            i += 1
+        return result
+
+
+# Main Program
 if __name__ == "__main__":
+
     indexer = BooleanRetrieval()
 
     documents = {
@@ -73,21 +104,29 @@ if __name__ == "__main__":
         3: "Boolean models are used in information retrieval"
     }
 
+    # Indexing documents
     for doc_id, text in documents.items():
         indexer.index_document(doc_id, text)
 
-    indexer.create_documents_matrix(documents)
+    # Create document-term matrix
+    indexer.create_documents_matrix()
     indexer.print_documents_matrix_table()
     indexer.print_all_terms()
 
-    query = input("Enter your boolean query: ")
+    # Boolean Search
+    query = input("\nEnter your boolean query: ")
     results = indexer.boolean_search(query)
+
     if results:
-        print(f"Results for '{query}': {results}")
+        print(f"\nResults for '{query}': {results}")
     else:
-        print("No results found for the query.")
+        print("\nNo results found for the query.")
+   ```
 
 
 ### Output:
+<img width="1347" height="325" alt="image" src="https://github.com/user-attachments/assets/7f3d0802-ac0a-4a41-9d26-5ef89e900445" />
+
 
 ### Result:
+Information Retrieval Using Boolean Model in Python is implemented Successfully
